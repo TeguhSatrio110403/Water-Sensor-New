@@ -10,7 +10,7 @@ const navBar = () => {
           <Navbar.Collapse className="justify-content-end">
             <Nav className="justify-content-end">
                 <Nav.Link className="item-list" href="dashboard">Dashboard</Nav.Link>
-                <Nav.Link className="item-list" href="feeds">Feeds</Nav.Link>
+                <Nav.Link className="item-list" /*</Nav>href="feeds"*/>Feeds</Nav.Link>
                 <Nav.Link className="item-list" href="about">About</Nav.Link>
             </Nav>
           </Navbar.Collapse>

@@ -20,7 +20,7 @@ const login = () => {
                     </div>
                     <input type="submit" name="login" value="LOGIN" onclick="Login()" />
                 </form>
-                <a href="./pages/home"><p>Kembali</p></a>
+                <a href="./home"><p>Home</p></a>
             </div>
     </div>
   )
