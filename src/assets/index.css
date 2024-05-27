@@ -169,17 +169,19 @@ input[type="submit"]:hover{
 
 #map { height: 180px; }
 
-.courses-box {
-  background-color: #ffff;
-  margin: 0 10%;
-  margin-top: 30px;
-  padding: 0 20px;
-  border-top: 1px solid rgb(224, 224, 224);
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.box-feeds{
+  margin-top: 60px;
+}
+
+.box-odometer{
+  width: 400px; 
+  margin: auto; 
+}
+
+.card {
+  width: 500px;
+  height: 500px;
+
 }
 
 .maps-box {
@@ -194,10 +196,6 @@ input[type="submit"]:hover{
   align-items: center;
 }
 
-MapContainer{
-  height: 400px;
-}
-
 .details {
   height: 100%;
   flex: 1;
@@ -206,12 +204,13 @@ MapContainer{
 
 .details > h1 {
   width: 100%;
-  height: 350px;
+  height: 220px;
   padding: 0;
   margin-top: 30px;
   align-items: center;
   text-align: center;
 }
+
 
 /*FEEDS*/
 .feeds-box {
@@ -328,22 +327,20 @@ hr{
   font-size: 16px;
   margin-bottom: 10px;
 }
+
+/*Footer*/
 /*Footer*/
 .footer-box {
   margin-top: 100px;
   height: 80px;
   display: flex;
-  padding: 0 10%;
-  align-items: center;
-  justify-content:center;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
   background: #e2e2e2;
 }
 
-.footer-isi {
-  display: flex;
-  gap: 30px;
-}
-
-footer p{
+footer p {
   color: black;
+  text-align: center;
+  margin: 0;  /* Remove any default margins */
 }
