@@ -11,43 +11,25 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import mqtt from 'mqtt';
 
-var options = {
-  host: '3a6152cff8674790bcad3c3c23ee9a34.s1.eu.hivemq.cloud',
-  port: 8883,
-  protocol: 'mqtts',
-  username: 'admin',
-  password: 'Water123456'
-}
-
-var client = mqtt.connect(options);
-
-client.on('connect', function () {
-  console.log('Connected');
-});
-
-client.on('error', function (error) {
-  console.log(error);
-});
-
-client.on('message', function (topic, message) {
-  console.log('Received message:', topic, message.toString());
-});
-
-client.subscribe('home/topic/sensors');
-
-// publish message 'Hello' to topic 'my/test/topic'
-client.publish('home/topic/sensors', 'Sir Fai');
-
 const RecenterAutomatically = ({ lat, lng }) => {
   const map = useMap();
   useEffect(() => {
     map.setView([lat, lng]);
   }, [lat, lng, map]);
   return null;
-}
+};
 
 const Dashboard = () => {
-  const [position, setPosition] = useState([51.505, -0.09], 1);
+  const [position, setPosition] = useState([51.505, -0.09]);
+  const [history, setHistory] = useState([]);
+  const [odometerValues, setOdometerValues] = useState({
+    ph: 0,
+    accelX: 0,
+    accelY: 0,
+    accelZ: 0,
+    temp: 0,
+    turbidity: 0
+  });
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -55,6 +37,7 @@ const Dashboard = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setPosition([latitude, longitude]);
+          setHistory((prevHistory) => [...prevHistory, [latitude, longitude]]);
         },
         (error) => {
           console.error("Error getting the geolocation", error);
@@ -71,14 +54,48 @@ const Dashboard = () => {
     }
   }, []);
 
-  const odometerValuePH = 5.7;
-  const odometerValueAccelX= 59; 
-  const odometerValueAccelY= 46;
-  const odometerValueAccelZ= 26;
-  const odometerValueTemp= 34;
-  const odometerValueTurbidity= 66;  
-  
+  useEffect(() => {
+    const options = {
+      host: '3a6152cff8674790bcad3c3c23ee9a34.s1.eu.hivemq.cloud',
+      port: 8883,
+      protocol: 'mqtts',
+      username: 'admin',
+      password: 'Water123456'
+    };
 
+    const client = mqtt.connect(options);
+
+    client.on('connect', () => {
+      console.log('Connected to MQTT broker');
+      client.subscribe('home/topic/sensors', (err) => {
+        if (err) {
+          console.error('Subscription error:', err);
+        }
+      });
+    });
+
+    client.on('error', (error) => {
+      console.error('MQTT Connection Error:', error);
+    });
+
+    client.on('message', (topic, message) => {
+      const parsedMessage = JSON.parse(message.toString());
+      setOdometerValues({
+        ph: parsedMessage.ph,
+        accelX: parsedMessage.accelX,
+        accelY: parsedMessage.accelY,
+        accelZ: parsedMessage.accelZ,
+        temp: parsedMessage.temp,
+        turbidity: parsedMessage.turbidity
+      });
+    });
+
+    return () => {
+      client.end();
+    };
+  }, []);
+
+  const { ph, accelX, accelY, accelZ, temp, turbidity } = odometerValues;
 
   return (
     <div>
@@ -98,6 +115,9 @@ const Dashboard = () => {
               />
               <Marker position={position} />
               <RecenterAutomatically lat={position[0]} lng={position[1]} />
+              {history.map((pos, idx) => (
+                <Marker key={idx} position={pos} />
+              ))}
             </MapContainer>
           </div>
         </div>
@@ -109,16 +129,15 @@ const Dashboard = () => {
               <Card.Body>
                 <Card.Text>
                   <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValueAccelX}
-                      text={`${odometerValueAccelX} m/s²`}
+                    <CircularProgressbar
+                      value={accelX}
+                      text={`${accelX} m/s²`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>
@@ -131,17 +150,16 @@ const Dashboard = () => {
             <Card className="card mx-auto">
               <Card.Body>
                 <Card.Text>
-                <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValueAccelY}
-                      text={`${odometerValueAccelY} m/s²`}
+                  <div className="box-odometer">
+                    <CircularProgressbar
+                      value={accelY}
+                      text={`${accelY} m/s²`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>
@@ -156,17 +174,16 @@ const Dashboard = () => {
             <Card className="card mx-auto">
               <Card.Body>
                 <Card.Text>
-                <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValueAccelZ}
-                      text={`${odometerValueAccelZ} m/s²`}
+                  <div className="box-odometer">
+                    <CircularProgressbar
+                      value={accelZ}
+                      text={`${accelZ} m/s²`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>
@@ -179,17 +196,16 @@ const Dashboard = () => {
             <Card className="card mx-auto">
               <Card.Body>
                 <Card.Text>
-                <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValuePH}
-                      text={`${odometerValuePH} pH`}
+                  <div className="box-odometer">
+                    <CircularProgressbar
+                      value={ph}
+                      text={`${ph} pH`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>
@@ -204,17 +220,16 @@ const Dashboard = () => {
             <Card className="card mx-auto">
               <Card.Body>
                 <Card.Text>
-                <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValueTemp}
-                      text={`${odometerValueTemp} °C`}
+                  <div className="box-odometer">
+                    <CircularProgressbar
+                      value={temp}
+                      text={`${temp} °C`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>
@@ -227,17 +242,16 @@ const Dashboard = () => {
             <Card className="card mx-auto">
               <Card.Body>
                 <Card.Text>
-                <div className="box-odometer">
-                  <CircularProgressbar
-                      value={odometerValueTurbidity}
-                      text={`${odometerValueTurbidity} NTU`}
+                  <div className="box-odometer">
+                    <CircularProgressbar
+                      value={turbidity}
+                      text={`${turbidity} NTU`}
                       styles={buildStyles({
                         textColor: 'black',
                         pathColor: 'red',
                         trailColor: 'black'
                       })}
-                    />    
-
+                    />
                   </div><br />
                   <h5><center>Date ada disini</center></h5>
                 </Card.Text>

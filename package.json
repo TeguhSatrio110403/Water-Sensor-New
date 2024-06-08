@@ -12,6 +12,7 @@
   "dependencies": {
     "bootstrap": "^5.3.3",
     "leaflet": "^1.9.4",
+    "mqtt": "^5.7.0",
     "odometer": "^0.4.8",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.2",
